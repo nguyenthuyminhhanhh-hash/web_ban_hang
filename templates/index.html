@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Sổ bán hàng</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f2f2f2;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h2 {
+            text-align: center;
+            font-size: 32px;
+            margin-bottom: 20px;
+        }
+
+        .box {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+        }
+
+        label {
+            font-size: 20px;
+        }
+
+        input {
+            font-size: 20px;
+            padding: 8px;
+            width: 100%;
+            margin: 8px 0 12px;
+        }
+
+        button {
+            font-size: 20px;
+            padding: 12px;
+            width: 100%;
+            border: none;
+            border-radius: 8px;
+            margin-top: 5px;
+        }
+
+        .add {
+            background: #FF9800;
+            color: white;
+        }
+
+        .sell {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .update {
+            background: #2196F3;
+            color: white;
+        }
+
+        .name {
+            font-size: 26px;
+            font-weight: bold;
+        }
+
+        .stock {
+            font-size: 22px;
+            margin: 10px 0 15px;
+        }
+    </style>
+</head>
+
+<body>
+    <h2>SỔ BÁN HÀNG</h2>
+
+    <!-- THÊM SẢN PHẨM -->
+    <div class="box">
+        <form method="post">
+            <input type="hidden" name="action" value="add_product">
+
+            <label>Tên sản phẩm</label>
+            <input type="text" name="name" required>
+
+            <label>Số lượng tồn ban đầu</label>
+            <input type="number" name="stock" min="0" required>
+
+            <button class="add">THÊM SẢN PHẨM</button>
+        </form>
+    </div>
+
+    <!-- DANH SÁCH SẢN PHẨM -->
+    {% for p in products %}
+    <div class="box">
+        <div class="name">{{ p[1] }}</div>
+        <div class="stock">Tồn hiện tại: {{ p[2] }}</div>
+
+        <!-- BÁN -->
+        <form method="post">
+            <input type="hidden" name="action" value="sell">
+            <input type="hidden" name="product_id" value="{{ p[0] }}">
+
+            <label>Bán hôm nay</label>
+            <input type="number" name="quantity" min="1" required>
+
+            <button class="sell">GHI BÁN</button>
+        </form>
+
+        <hr>
+
+        <!-- CẬP NHẬT TỒN -->
+        <form method="post">
+            <input type="hidden" name="action" value="update_stock">
+            <input type="hidden" name="product_id" value="{{ p[0] }}">
+
+            <label>Chỉnh tồn mới</label>
+            <input type="number" name="new_stock" min="0" required>
+
+            <button class="update">CẬP NHẬT TỒN</button>
+        </form>
+    </div>
+    {% endfor %}
+</body>
+</html>
