@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Lịch sử bán</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            background: #f2f2f2;
+            padding: 20px;
+        }
+
+        h2 {
+            text-align: center;
+            font-size: 32px;
+        }
+
+        .box {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px auto;
+            max-width: 700px;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+        }
+
+        .item {
+            font-size: 20px;
+            padding: 10px 0;
+            border-bottom: 1px solid #ddd;
+        }
+
+        button {
+            font-size: 20px;
+            padding: 12px;
+            width: 100%;
+            border: none;
+            border-radius: 10px;
+            background: #673AB7;
+            color: white;
+            margin-bottom: 15px;
+        }
+
+        a {
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+    <h2>📅 LỊCH SỬ BÁN</h2>
+
+    <div class="box">
+        <a href="/export">
+            <button> XUẤT EXCEL</button>
+        </a>
+
+        {% for s in sales %}
+            <div class="item">
+                {{ s[0] }} — <b>{{ s[1] }}</b> — SL: {{ s[2] }}
+            </div>
+        {% endfor %}
+    </div>
+
+    <div style="text-align:center;">
+        <a href="/">⬅️ Quay lại bán hàng</a>
+    </div>
+</body>
+</html>

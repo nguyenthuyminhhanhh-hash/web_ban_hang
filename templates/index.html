@@ -92,6 +92,9 @@
         {% endfor %}
     </select>
 </div>
+<a href="/history">
+    <button class="menu-btn"> ->🔍 LỊCH SỬ BÁN</button>
+</a>
 
 
     <!-- THÊM SẢN PHẨM -->
@@ -117,6 +120,9 @@
     <div class="box product-item" data-id="{{ p[0] }}">
         <div class="name product-name">{{ p[1] }}</div>
         <div class="stock">Tồn hiện tại: {{ p[2] }}</div>
+        <div style="font-size:18px;color:#555;">
+        Ngày nhập kho: {{ p[3] }}</div>
+
 
         <!-- BÁN -->
         <form method="post">
@@ -126,10 +132,6 @@
             <label>Ngày bán</label>
             <input type="date" name="sell_date" value="{{ today }}" required>
             <label>Số lượng bán</label>
-            <input type="number" name="quantity" min="1" required>
-
-
-            <label>Bán hôm nay</label>
             <input type="number" name="quantity" min="1" required>
 
             <button class="sell">GHI BÁN</button>
@@ -172,18 +174,14 @@ function searchProduct() {
     });
 }
 </script>
-<a href="/export">
-    <button style="background:#673AB7;color:white;font-size:20px;">
-         XUẤT EXCEL
-    </button>
-</a>
 
-<div class="box">
-    <h3 style="font-size:26px;text-align:center;">📅 LỊCH SỬ BÁN</h3>
 
     {% for s in sales %}
         <div style="font-size:20px; margin:10px 0;">
-            {{ s[0] }} — <b>{{ s[1] }}</b> — SL: {{ s[2] }}
+         Bán: {{ s[0] }} — <b>{{ s[1] }}</b> — SL: {{ s[2] }}
+        <br>
+        📦 Nhập kho: {{ s[3] }}
+
         </div>
     {% endfor %}
 </div>

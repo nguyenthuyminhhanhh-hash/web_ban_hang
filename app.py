@@ -23,10 +23,11 @@ def index():
         if action == "add_product":
             name = request.form["name"]
             stock = int(request.form["stock"])
+            import_date = request.form["import_date"]
 
             c.execute(
-                "INSERT INTO products (name, stock) VALUES (?, ?)",
-                (name, stock)
+                "INSERT INTO products (name, stock,import_date) VALUES (?, ?, ?)",
+                (name, stock, import_date)
             )
 
         # 2️⃣ BÁN HÀNG
@@ -58,7 +59,7 @@ def index():
                 "UPDATE products SET stock = ? WHERE id = ?",
                 (new_stock, product_id)
             )
-            cursor.execute(
+            c.execute(
                 "INSERT INTO sales (product_id, quantity, sale_date) VALUES (?, ?, ?)",
                 (product_id, quantity, sale_date)
             )
@@ -67,7 +68,7 @@ def index():
         return redirect("/")
 
     # GET
-    c.execute("SELECT id, name, stock FROM products")
+    c.execute("SELECT id, name, stock, import_date FROM products")
     products = c.fetchall()
     # GET sales history
     c.execute("""
@@ -118,5 +119,21 @@ def export_excel():
         download_name="lich_su_ban_hang.xlsx",
         mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
+@app.route("/history")
+def history():
+    conn = get_db()
+    c = conn.cursor()
+
+    c.execute("""
+    SELECT sales.sale_date, products.name, sales.quantity
+    FROM sales
+    JOIN products ON sales.product_id = products.id
+    ORDER BY sales.sale_date DESC
+    """)
+    sales = c.fetchall()
+    conn.close()
+
+    return render_template("history.html", sales=sales)
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=10000)
