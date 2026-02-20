@@ -16,8 +16,9 @@ def index():
     conn = get_db()
     c = conn.cursor()
 
+    # ===== POST =====
     if request.method == "POST":
-        action = request.form["action"]
+        action = request.form.get("action")
 
         # 1️⃣ THÊM SẢN PHẨM
         if action == "add_product":
@@ -26,7 +27,7 @@ def index():
             import_date = request.form["import_date"]
 
             c.execute(
-                "INSERT INTO products (name, stock,import_date) VALUES (?, ?, ?)",
+                "INSERT INTO products (name, stock, import_date) VALUES (?, ?, ?)",
                 (name, stock, import_date)
             )
 
@@ -34,7 +35,7 @@ def index():
         elif action == "sell":
             product_id = int(request.form["product_id"])
             quantity = int(request.form["quantity"])
-            today = date.today().isoformat()
+            sale_date = request.form["sell_date"]
 
             c.execute("SELECT stock FROM products WHERE id = ?", (product_id,))
             stock = c.fetchone()[0]
@@ -42,7 +43,7 @@ def index():
             if quantity <= stock:
                 c.execute(
                     "INSERT INTO sales (product_id, quantity, sale_date) VALUES (?, ?, ?)",
-                    (product_id, quantity, today)
+                    (product_id, quantity, sale_date)
                 )
                 c.execute(
                     "UPDATE products SET stock = stock - ? WHERE id = ?",
@@ -51,7 +52,6 @@ def index():
 
         # 3️⃣ CẬP NHẬT TỒN
         elif action == "update_stock":
-            sale_date = request.form['sell_date']
             product_id = int(request.form["product_id"])
             new_stock = int(request.form["new_stock"])
 
@@ -59,31 +59,40 @@ def index():
                 "UPDATE products SET stock = ? WHERE id = ?",
                 (new_stock, product_id)
             )
-            c.execute(
-                "INSERT INTO sales (product_id, quantity, sale_date) VALUES (?, ?, ?)",
-                (product_id, quantity, sale_date)
-            )
+
+        # 4️⃣ XÓA SẢN PHẨM
+        elif action == "delete_product":
+            product_id = int(request.form["product_id"])
+
+            c.execute("DELETE FROM sales WHERE product_id = ?", (product_id,))
+            c.execute("DELETE FROM products WHERE id = ?", (product_id,))
 
         conn.commit()
+        conn.close()
         return redirect("/")
 
-    # GET
+    # ===== GET =====
     c.execute("SELECT id, name, stock, import_date FROM products")
     products = c.fetchall()
-    # GET sales history
+
     c.execute("""
-    SELECT sales.sale_date, products.name, sales.quantity
-    FROM sales
-    JOIN products ON sales.product_id = products.id
-    ORDER BY sales.sale_date DESC
+        SELECT sales.sale_date, products.name, sales.quantity
+        FROM sales
+        JOIN products ON sales.product_id = products.id
+        ORDER BY sales.sale_date DESC
     """)
     sales = c.fetchall()
+
     conn.close()
-    
-    return render_template("index.html",
-    products=products,
-    sales=sales,
-    today=date.today().isoformat())
+
+    return render_template(
+        "index.html",
+        products=products,
+        sales=sales,
+        today=date.today().isoformat()
+    )
+
+
 
 
 @app.route("/export")

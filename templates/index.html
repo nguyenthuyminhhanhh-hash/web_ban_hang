@@ -122,6 +122,24 @@
         <div class="stock">Tồn hiện tại: {{ p[2] }}</div>
         <div style="font-size:18px;color:#555;">
         Ngày nhập kho: {{ p[3] }}</div>
+    <hr>
+
+<form method="post" onsubmit="return confirm('Bạn có chắc muốn xóa sản phẩm này không?');">
+    <input type="hidden" name="action" value="delete_product">
+    <input type="hidden" name="product_id" value="{{ p[0] }}">
+
+    <button style="
+        background:#f44336;
+        color:white;
+        font-size:20px;
+        padding:12px;
+        width:100%;
+        border:none;
+        border-radius:8px;
+    ">
+        🗑️ XÓA SẢN PHẨM
+    </button>
+</form>
 
 
         <!-- BÁN -->
