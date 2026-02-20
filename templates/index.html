@@ -75,6 +75,24 @@
 
 <body>
     <h2>SỔ BÁN HÀNG</h2>
+    <!-- MENU TÌM KIẾM & CHỌN SẢN PHẨM -->
+<div class="box">
+    <input
+        type="text"
+        id="searchInput"
+        placeholder="🔍 Tìm sản phẩm..."
+        onkeyup="searchProduct()"
+    >
+
+    <select id="productSelect" onchange="filterProduct()"
+            style="font-size:20px; padding:8px; width:100%;">
+        <option value="">-- Chọn sản phẩm --</option>
+        {% for p in products %}
+            <option value="{{ p[0] }}">{{ p[1] }}</option>
+        {% endfor %}
+    </select>
+</div>
+
 
     <!-- THÊM SẢN PHẨM -->
     <div class="box">
@@ -86,6 +104,9 @@
 
             <label>Số lượng tồn ban đầu</label>
             <input type="number" name="stock" min="0" required>
+            <label>Ngày nhập kho</label>
+            <input type="date" name="import_date" required>
+
 
             <button class="add">THÊM SẢN PHẨM</button>
         </form>
@@ -93,14 +114,20 @@
 
     <!-- DANH SÁCH SẢN PHẨM -->
     {% for p in products %}
-    <div class="box">
-        <div class="name">{{ p[1] }}</div>
+    <div class="box product-item" data-id="{{ p[0] }}">
+        <div class="name product-name">{{ p[1] }}</div>
         <div class="stock">Tồn hiện tại: {{ p[2] }}</div>
 
         <!-- BÁN -->
         <form method="post">
             <input type="hidden" name="action" value="sell">
             <input type="hidden" name="product_id" value="{{ p[0] }}">
+
+            <label>Ngày bán</label>
+            <input type="date" name="sell_date" value="{{ today }}" required>
+            <label>Số lượng bán</label>
+            <input type="number" name="quantity" min="1" required>
+
 
             <label>Bán hôm nay</label>
             <input type="number" name="quantity" min="1" required>
@@ -122,5 +149,44 @@
         </form>
     </div>
     {% endfor %}
+    <script>
+function filterProduct() {
+    const selectedId = document.getElementById("productSelect").value;
+    const items = document.querySelectorAll(".product-item");
+
+    items.forEach(item => {
+        item.style.display =
+            selectedId === "" || item.dataset.id === selectedId
+            ? "block"
+            : "none";
+    });
+}
+
+function searchProduct() {
+    const keyword = document.getElementById("searchInput").value.toLowerCase();
+    const items = document.querySelectorAll(".product-item");
+
+    items.forEach(item => {
+        const name = item.querySelector(".product-name").innerText.toLowerCase();
+        item.style.display = name.includes(keyword) ? "block" : "none";
+    });
+}
+</script>
+<a href="/export">
+    <button style="background:#673AB7;color:white;font-size:20px;">
+         XUẤT EXCEL
+    </button>
+</a>
+
+<div class="box">
+    <h3 style="font-size:26px;text-align:center;">📅 LỊCH SỬ BÁN</h3>
+
+    {% for s in sales %}
+        <div style="font-size:20px; margin:10px 0;">
+            {{ s[0] }} — <b>{{ s[1] }}</b> — SL: {{ s[2] }}
+        </div>
+    {% endfor %}
+</div>
+
 </body>
 </html>
