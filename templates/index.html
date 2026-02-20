@@ -1,208 +1,145 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8">
-    <title>Sổ bán hàng</title>
+<meta charset="UTF-8">
+<title>Sổ bán hàng</title>
 
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f2f2f2;
-            margin: 0;
-            padding: 20px;
-        }
+<style>
+body {
+    font-family: Arial;
+    background:#f2f2f2;
+    padding:20px;
+}
 
-        h2 {
-            text-align: center;
-            font-size: 32px;
-            margin-bottom: 20px;
-        }
+h2 {
+    text-align:center;
+    font-size:32px;
+    margin-bottom:15px;
+}
 
-        .box {
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 25px;
-            box-shadow: 0 3px 8px rgba(0,0,0,0.1);
-        }
+.box {
+    background:white;
+    border-radius:12px;
+    padding:15px;
+    margin-bottom:15px;
+}
 
-        label {
-            font-size: 20px;
-        }
+input, button {
+    font-size:18px;
+    padding:8px;
+    width:100%;
+    margin:5px 0;
+}
 
-        input {
-            font-size: 20px;
-            padding: 8px;
-            width: 100%;
-            margin: 8px 0 12px;
-        }
+button {
+    border:none;
+    border-radius:8px;
+    color:white;
+}
 
-        button {
-            font-size: 20px;
-            padding: 12px;
-            width: 100%;
-            border: none;
-            border-radius: 8px;
-            margin-top: 5px;
-        }
+.add { background:#FF9800; }
+.sell { background:#4CAF50; }
+.update { background:#2196F3; }
+.delete { background:#f44336; }
 
-        .add {
-            background: #FF9800;
-            color: white;
-        }
+.row {
+    display:flex;
+    justify-content:space-between;
+    padding:12px;
+    border-bottom:1px solid #ddd;
+    cursor:pointer;
+    font-size:20px;
+}
 
-        .sell {
-            background: #4CAF50;
-            color: white;
-        }
-
-        .update {
-            background: #2196F3;
-            color: white;
-        }
-
-        .name {
-            font-size: 26px;
-            font-weight: bold;
-        }
-
-        .stock {
-            font-size: 22px;
-            margin: 10px 0 15px;
-        }
-    </style>
+.detail {
+    display:none;
+    padding:10px;
+    background:#fafafa;
+    border-radius:8px;
+    margin-bottom:10px;
+}
+</style>
 </head>
 
 <body>
-    <h2>SỔ BÁN HÀNG</h2>
-    <!-- MENU TÌM KIẾM & CHỌN SẢN PHẨM -->
+
+<h2>📒 SỔ BÁN HÀNG</h2>
+
+<!-- MENU -->
 <div class="box">
-    <input
-        type="text"
-        id="searchInput"
-        placeholder="🔍 Tìm sản phẩm..."
-        onkeyup="searchProduct()"
-    >
-
-    <select id="productSelect" onchange="filterProduct()"
-            style="font-size:20px; padding:8px; width:100%;">
-        <option value="">-- Chọn sản phẩm --</option>
-        {% for p in products %}
-            <option value="{{ p[0] }}">{{ p[1] }}</option>
-        {% endfor %}
-    </select>
+    <a href="/export">
+        <button style="background:#673AB7;">⬇️ XUẤT EXCEL</button>
+    </a>
 </div>
-<a href="/history">
-    <button class="menu-btn"> ->🔍 LỊCH SỬ BÁN</button>
-</a>
 
-
-    <!-- THÊM SẢN PHẨM -->
-    <div class="box">
-        <form method="post">
-            <input type="hidden" name="action" value="add_product">
-
-            <label>Tên sản phẩm</label>
-            <input type="text" name="name" required>
-
-            <label>Số lượng tồn ban đầu</label>
-            <input type="number" name="stock" min="0" required>
-            <label>Ngày nhập kho</label>
-            <input type="date" name="import_date" required>
-
-
-            <button class="add">THÊM SẢN PHẨM</button>
-        </form>
-    </div>
-
-    <!-- DANH SÁCH SẢN PHẨM -->
-    {% for p in products %}
-    <div class="box product-item" data-id="{{ p[0] }}">
-        <div class="name product-name">{{ p[1] }}</div>
-        <div class="stock">Tồn hiện tại: {{ p[2] }}</div>
-        <div style="font-size:18px;color:#555;">
-        Ngày nhập kho: {{ p[3] }}</div>
-    <hr>
-
-<form method="post" onsubmit="return confirm('Bạn có chắc muốn xóa sản phẩm này không?');">
-    <input type="hidden" name="action" value="delete_product">
-    <input type="hidden" name="product_id" value="{{ p[0] }}">
-
-    <button style="
-        background:#f44336;
-        color:white;
-        font-size:20px;
-        padding:12px;
-        width:100%;
-        border:none;
-        border-radius:8px;
-    ">
-        🗑️ XÓA SẢN PHẨM
-    </button>
+<!-- THÊM SẢN PHẨM -->
+<div class="box">
+<form method="post">
+    <input type="hidden" name="action" value="add_product">
+    <input name="name" placeholder="Tên sản phẩm" required>
+    <input type="number" name="stock" placeholder="SL nhập" required>
+    <input type="date" name="import_date" required>
+    <button class="add">➕ THÊM</button>
 </form>
+</div>
 
+<!-- DANH SÁCH SẢN PHẨM -->
+<div class="box">
+<h3>📦 SẢN PHẨM</h3>
 
-        <!-- BÁN -->
-        <form method="post">
-            <input type="hidden" name="action" value="sell">
-            <input type="hidden" name="product_id" value="{{ p[0] }}">
+{% for p in products %}
+<div class="row" onclick="toggle('{{ p[0] }}')">
+    <b>{{ p[1] }}</b>
+    <span>Tồn: {{ p[2] }}</span>
+</div>
 
-            <label>Ngày bán</label>
-            <input type="date" name="sell_date" value="{{ today }}" required>
-            <label>Số lượng bán</label>
-            <input type="number" name="quantity" min="1" required>
+<div class="detail" id="d{{ p[0] }}">
 
-            <button class="sell">GHI BÁN</button>
-        </form>
+    <!-- BÁN -->
+    <form method="post">
+        <input type="hidden" name="action" value="sell">
+        <input type="hidden" name="product_id" value="{{ p[0] }}">
+        <input type="date" name="sell_date" value="{{ today }}">
+        <input type="number" name="quantity" placeholder="Số lượng bán" required>
+        <button class="sell">BÁN</button>
+    </form>
 
-        <hr>
+    <!-- CẬP NHẬT TỒN -->
+    <form method="post">
+        <input type="hidden" name="action" value="update_stock">
+        <input type="hidden" name="product_id" value="{{ p[0] }}">
+        <input type="number" name="new_stock" placeholder="Tồn mới" required>
+        <button class="update">SỬA TỒN</button>
+    </form>
 
-        <!-- CẬP NHẬT TỒN -->
-        <form method="post">
-            <input type="hidden" name="action" value="update_stock">
-            <input type="hidden" name="product_id" value="{{ p[0] }}">
+    <!-- XÓA -->
+    <form method="post" onsubmit="return confirm('Xóa sản phẩm này?')">
+        <input type="hidden" name="action" value="delete_product">
+        <input type="hidden" name="product_id" value="{{ p[0] }}">
+        <button class="delete">❌ XÓA</button>
+    </form>
 
-            <label>Chỉnh tồn mới</label>
-            <input type="number" name="new_stock" min="0" required>
+</div>
+{% endfor %}
+</div>
 
-            <button class="update">CẬP NHẬT TỒN</button>
-        </form>
-    </div>
-    {% endfor %}
-    <script>
-function filterProduct() {
-    const selectedId = document.getElementById("productSelect").value;
-    const items = document.querySelectorAll(".product-item");
+<!-- LỊCH SỬ BÁN -->
+<div class="box">
+<h3>📊 LỊCH SỬ BÁN</h3>
 
-    items.forEach(item => {
-        item.style.display =
-            selectedId === "" || item.dataset.id === selectedId
-            ? "block"
-            : "none";
-    });
-}
+{% for s in sales %}
+<div style="font-size:18px; margin:6px 0;">
+📅 {{ s[0] }} — <b>{{ s[1] }}</b> — SL: {{ s[2] }}
+</div>
+{% endfor %}
+</div>
 
-function searchProduct() {
-    const keyword = document.getElementById("searchInput").value.toLowerCase();
-    const items = document.querySelectorAll(".product-item");
-
-    items.forEach(item => {
-        const name = item.querySelector(".product-name").innerText.toLowerCase();
-        item.style.display = name.includes(keyword) ? "block" : "none";
-    });
+<script>
+function toggle(id){
+    let d = document.getElementById("d"+id);
+    d.style.display = d.style.display === "block" ? "none" : "block";
 }
 </script>
-
-
-    {% for s in sales %}
-        <div style="font-size:20px; margin:10px 0;">
-         Bán: {{ s[0] }} — <b>{{ s[1] }}</b> — SL: {{ s[2] }}
-        <br>
-        📦 Nhập kho: {{ s[3] }}
-
-        </div>
-    {% endfor %}
-</div>
 
 </body>
 </html>
